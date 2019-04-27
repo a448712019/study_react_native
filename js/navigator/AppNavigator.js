@@ -10,7 +10,9 @@ import {createReactNavigationReduxMiddleware,createReduxContainer} from 'react-n
 import WelcomePage from '../page/WelcomePage';
 import HomePage from '../page/HomePage';
 import DetailPage from '../page/DetailPage';
-
+import FetchDemoPage from '../page/FetchDemoPage';
+import AsyncStorageDemoPage from '../page/AsyncStorageDemoPage';
+import DataStoreDemoPage from '../page/DataStoreDemoPage';
 export const rootCom="Init";//设置根路由
 
 const InitNavigator=createStackNavigator({
@@ -34,7 +36,26 @@ const MainNavigator=createStackNavigator({
     navigationOptions:{
       // header:null,
     }
+  },
+  FetchDemoPage:{
+    screen:FetchDemoPage,
+    navigationOptions:{
+      // header:null,
+    }
+  },
+  AsyncStorageDemoPage:{
+    screen:AsyncStorageDemoPage,
+    navigationOptions:{
+
+    }
+  },
+  DataStoreDemoPage:{
+    screen:DataStoreDemoPage,
+    navigationOptions:{
+
+    }
   }
+
 });
 
 export const RootNavigator=createAppContainer(createSwitchNavigator({

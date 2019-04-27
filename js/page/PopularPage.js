@@ -7,7 +7,7 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import {Platform, StyleSheet, Text, View,Button} from 'react-native';
 import {createMaterialTopTabNavigator,createAppContainer} from "react-navigation";
 import NavigationUtil from '../navigator/NavigationUtil';
 
@@ -69,6 +69,17 @@ export default class PopularPage extends Component<Props> {
         <Text onPress={()=>{
           NavigationUtil.goPage({},'DetailPage')
         }}>跳转到详情页</Text>
+        <Button title={'跳转到FetchDemoPage'} onPress={()=>{
+          NavigationUtil.goPage({},'FetchDemoPage');
+        }}/>
+
+        <Button title={'跳转到AsyncStorageDemoPage'} onPress={()=>{
+          NavigationUtil.goPage({},'AsyncStorageDemoPage');
+        }}/>
+        <Button title={'跳转到DataStoreDemoPage'} onPress={()=>{
+          NavigationUtil.goPage({},'DataStoreDemoPage');
+        }}/>
+
       </View>
     );
   }
