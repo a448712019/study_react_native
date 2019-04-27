@@ -12,7 +12,11 @@
     "react-native-gesture-handler": "^1.1.0",
     "react-native-tabs": "^1.0.9",
     "react-native-vector-icons": "^6.4.2",
-    "react-navigation": "^3.9.0"
+    "react-navigation": "^3.9.0",
+    "react-navigation-redux-helpers": "^3.0.2",
+    "react-redux": "^7.0.2",
+    "redux": "^4.0.1",
+    "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
     "@babel/core": "7.4.3",
@@ -20,7 +24,8 @@
     "babel-jest": "24.7.1",
     "jest": "24.7.1",
     "metro-react-native-babel-preset": "0.53.1",
-    "react-test-renderer": "16.8.3"
+    "react-test-renderer": "16.8.3",
+    "redux-devtools": "^3.5.0"
   },
   "jest": {
     "preset": "react-native"

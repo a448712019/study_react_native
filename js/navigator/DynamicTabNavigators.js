@@ -17,6 +17,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import NavigationUtil from "../navigator/NavigationUtil";
+import {connect} from 'react-redux';
 
 type Props = {};
 const TABS={//在这里配置页面的路由
@@ -72,25 +73,33 @@ const TABS={//在这里配置页面的路由
       )
     }
   },
-}
-export default class DynamicTabNavigators extends Component<Props> {
+};
+class DynamicTabNavigators extends Component<Props> {
   constructor(props){
     super(props);
   }
   _tabNavigator(){
+    if(this.Tabs){
+      return this.Tabs;
+    }
+    console.log(this.props);
     const {PoplarPage,TrendingPage,FavoritePage,MyPage} =TABS;
     const tabs={PoplarPage,TrendingPage,FavoritePage,MyPage};//根据需要定制显示的tab
     PoplarPage.navigationOptions.tabBarLabel='最热';//动态更新tab属性
-    return createAppContainer(createBottomTabNavigator(
+    return this.Tabs = createAppContainer(createBottomTabNavigator(
       tabs,
       {
-        tabBarComponent:TabBarComponent
+        tabBarComponent:(props)=>{
+          console.log(props);
+          console.log(this.props);
+          return <TabBarComponent theme={this.props.theme} {...props}/>
+        }
 
       }
     ));
   }
   render() {
-    NavigationUtil.navigation=this.props.navigation;
+    console.log(this.props.theme);
     const Tab=this._tabNavigator();
     return <Tab />
   }
@@ -106,17 +115,10 @@ class TabBarComponent extends Component{
 
   }
   render() {
-    const {routes,index}=this.props.navigation.state;
-    if(routes[index].params){
-      const {theme}=routes[index].params;
-      //以最新的更新时间为主 防止被其他tab之前的修改覆盖掉
-      if(theme&&theme.updateTime>this.theme.updateTime){
-        this.theme=theme
-      }
-    }
+    console.log(this.props);
     return <BottomTabBar
       {...this.props}
-      activeTintColor={this.theme.tintColor||this.props.activeTintColor}
+      activeTintColor={this.props.theme}
 
     />;
   }
@@ -136,3 +138,7 @@ const styles = StyleSheet.create({
   },
 
 });
+const mapStateToProps=state=>({
+    theme:state.theme.theme
+});
+export default connect(mapStateToProps)(DynamicTabNavigators);
