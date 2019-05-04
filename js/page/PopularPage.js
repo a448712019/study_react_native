@@ -9,15 +9,16 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import actions from '../action/index';
-import {Platform,ActivityIndicator, StyleSheet, Text, View,Button,FlatList,RefreshControl} from 'react-native';
+import {Platform,DeviceInfo,ActivityIndicator, StyleSheet, Text, View,Button,FlatList,RefreshControl} from 'react-native';
 import {createMaterialTopTabNavigator,createAppContainer} from "react-navigation";
 import NavigationUtil from '../navigator/NavigationUtil';
 import PopularItem from '../common/PopularItem';
 import Toast from 'react-native-easy-toast';
+import NavigationBar from '../common/NavigationBar';
 
 const URL='https://api.github.com/search/repositories?q=';
 const QUERY_STR='&sort=stars';
-const THEME_COLOR='red';
+const THEME_COLOR='#678';
 type Props = {};
 export default class PopularPage extends Component<Props> {
   constructor(props){
@@ -44,6 +45,16 @@ export default class PopularPage extends Component<Props> {
 
 
   render() {
+    let statusBar={
+      backgroundColor:THEME_COLOR,
+      barStyle:'light-content'
+    };
+    let navigationBar=<NavigationBar
+      title={'最热'}
+      statusBar={statusBar}
+      style={{backgroundColor:THEME_COLOR}}
+
+    />;
     const TabNavigator=createAppContainer(createMaterialTopTabNavigator(
         this._genTabs(),{
           tabBarOptions:{
@@ -52,6 +63,7 @@ export default class PopularPage extends Component<Props> {
             scrollEnabled:true, //滚动选项卡
             style:{
               backgroundColor:'#678',//改变背景色
+              height:30//fix 开启scrollEnabled后在android上初次加载时闪烁问题
             },
             indicatorStyle:styles.indicatorStyle,//指示器样式
             labelStyle:styles.labelStyle,//文字样式
@@ -59,7 +71,8 @@ export default class PopularPage extends Component<Props> {
       }
     ));
     return (
-      <View style={{flex:1,marginTop:30}}>
+      <View style={{flex:1,marginTop:DeviceInfo.isIPhoneX_deprecated?30:0}}>
+        {navigationBar}
         <TabNavigator/>
       </View>
     );
@@ -112,6 +125,9 @@ const pageSize=10;//设置为常量  防止修改
    renderItem(data){
     const item=data.item;
     return <PopularItem item={item} onSelect={()=>{
+      NavigationUtil.goPage({
+        projectModes: item
+      },'DetailPage')
     }
     }/>
    }
@@ -172,7 +188,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   tabStyle:{
-    minWidth: 50
+    // minWidth: 50
+    padding:0
   },
   indicatorStyle:{
     height:2,
@@ -180,8 +197,7 @@ const styles = StyleSheet.create({
   },
   labelStyle:{
     fontSize:13,
-    marginTop:6,
-    marginBottom:6
+    margin: 0
   },
   indicatorContainer:{
     alignItems:'center'

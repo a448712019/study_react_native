@@ -20,8 +20,7 @@ export default class NavigationUtil {
    * 返回上一页
    * @param params
    */
-  static goBack(params){
-    const {navigation}=params;
+  static goBack(navigation){
     navigation.goBack();
   }
 

@@ -7,7 +7,7 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import {Platform, StyleSheet, Text, View,DeviceInfo} from 'react-native';
 import {createStackNavigator,BottomTabBar,createAppContainer,createBottomTabNavigator} from "react-navigation";
 import PoplarPage from '../page/PopularPage';
 import FavoritePage from '../page/FavoritePage';
