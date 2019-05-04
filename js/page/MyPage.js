@@ -8,6 +8,7 @@
 
 import React, {Component} from 'react';
 import {Button, Platform, StyleSheet, Text, View} from 'react-native';
+import NavigationUtil from "../navigator/NavigationUtil";
 
 
 
@@ -35,6 +36,20 @@ export default class MyPage extends Component<Props> {
             }
           })
         }}/>
+        <Text onPress={()=>{
+          NavigationUtil.goPage({},'DetailPage')
+        }}>跳转到详情页</Text>
+        <Button title={'跳转到FetchDemoPage'} onPress={()=>{
+          NavigationUtil.goPage({},'FetchDemoPage');
+        }}/>
+
+        <Button title={'跳转到AsyncStorageDemoPage'} onPress={()=>{
+          NavigationUtil.goPage({},'AsyncStorageDemoPage');
+        }}/>
+        <Button title={'跳转到DataStoreDemoPage'} onPress={()=>{
+          NavigationUtil.goPage({},'DataStoreDemoPage');
+        }}/>
+
       </View>
     );
   }

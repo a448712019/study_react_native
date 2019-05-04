@@ -7,11 +7,17 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View,Button} from 'react-native';
+import {connect} from 'react-redux';
+import actions from '../action/index';
+import {Platform,ActivityIndicator, StyleSheet, Text, View,Button,FlatList,RefreshControl} from 'react-native';
 import {createMaterialTopTabNavigator,createAppContainer} from "react-navigation";
 import NavigationUtil from '../navigator/NavigationUtil';
+import PopularItem from '../common/PopularItem';
+import Toast from 'react-native-easy-toast';
 
-
+const URL='https://api.github.com/search/repositories?q=';
+const QUERY_STR='&sort=stars';
+const THEME_COLOR='red';
 type Props = {};
 export default class PopularPage extends Component<Props> {
   constructor(props){
@@ -23,12 +29,12 @@ export default class PopularPage extends Component<Props> {
     const tabs={};
     this.tabNames.forEach((item,index)=>{
       tabs[`tab${index}`]={
-        screen:props=><PopularTab {...props} tabLabel={item}/>,//形式传参数
+        screen:props=><PopularTabPage {...props} tabLabel={item}/>,//形式传参数
         navigationOptions:{
           title:item,
         }
       }
-    })
+    });
     return tabs;
   }
   componentDidMount(): void {
@@ -59,36 +65,111 @@ export default class PopularPage extends Component<Props> {
     );
   }
 }
-
+const pageSize=10;//设置为常量  防止修改
  class PopularTab extends Component<Props> {
-  render() {
+  constructor(props){
+    super(props);
+    console.log(this.props);
     const {tabLabel}=this.props;
+    this.storeName=tabLabel;
+  }
+  componentDidMount(): void {
+    this.loadData();
+  }
+   loadData(loadMore){
+    const {onRefreshPopular,onLoadMorePopular}=this.props;
+    const store=this._store();
+    const url=this.genFetchUrl(this.storeName);
+    if(loadMore){
+      onLoadMorePopular(this.storeName,++store.pageIndex,pageSize,store.items,(str)=>{
+        console.log('没有更多了');
+          this.toast.show('没有更多了');
+      });
+    }else{
+      onRefreshPopular(this.storeName,url,pageSize);
+    }
+
+   }
+   _store(){
+    const {popular}=this.props;
+    console.log(this.storeName);
+    let store=popular[this.storeName];
+    console.log(popular);
+    console.log(store);
+    if(!store){
+      store={
+        items:[],
+        isLoading: false,
+        projectModes:[],//要显示的数据
+        hideLoadingMore:true,//默认隐藏加载更多
+      }
+    }
+    return store;
+   }
+   genFetchUrl(key){
+    return URL+key+QUERY_STR;
+   }
+   renderItem(data){
+    const item=data.item;
+    return <PopularItem item={item} onSelect={()=>{
+    }
+    }/>
+   }
+   genIndicator(){
+      return this._store().hideLoadingMore?null:
+        <View style={styles.indicatorContainer}>
+          <ActivityIndicator style={styles.indicator}/>
+          <Text>正在加载更多</Text>
+        </View>
+   }
+   render() {
+
+    let store=this._store();
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>{tabLabel}</Text>
-        <Text onPress={()=>{
-          NavigationUtil.goPage({},'DetailPage')
-        }}>跳转到详情页</Text>
-        <Button title={'跳转到FetchDemoPage'} onPress={()=>{
-          NavigationUtil.goPage({},'FetchDemoPage');
-        }}/>
-
-        <Button title={'跳转到AsyncStorageDemoPage'} onPress={()=>{
-          NavigationUtil.goPage({},'AsyncStorageDemoPage');
-        }}/>
-        <Button title={'跳转到DataStoreDemoPage'} onPress={()=>{
-          NavigationUtil.goPage({},'DataStoreDemoPage');
-        }}/>
-
+        <FlatList renderItem={(data)=>this.renderItem(data)} data={store.projectModes}  keyExtractor={item=>''+item.id}
+          refreshControl={
+            <RefreshControl title={'Loading'} titleColor={THEME_COLOR}
+                            colors={[THEME_COLOR]}
+                            refreshing={store.isLoading}
+                            onRefresh={() => this.loadData()}
+                            tintColor={THEME_COLOR}
+            />
+          }
+          ListFooterComponent={()=>this.genIndicator()}
+          onEndReached={()=>{
+            setTimeout(()=>{
+              if(this.canLoadMore){
+                this.loadData(true);
+                this.canLoadMore=false;
+              }
+            },100)
+          }}
+          onEndReachedThreshold={0.5}
+          onMomentumScrollBegin={()=>{
+            this.canLoadMore=true;
+          }}
+        />
+        <Toast ref={toast=>this.toast=toast}
+          position={'center'}
+        />
       </View>
     );
   }
 }
+const mapStateToProps=state=>({
+  popular:state.popular
+});
+
+const mapDispatchToProps=dispatch=>({
+  onRefreshPopular: (storeName,url,pageSize)=>dispatch(actions.onRefreshPopular(storeName,url,pageSize)),
+    onLoadMorePopular: (storeName,pageIndex,pageSize,item,callBack)=>dispatch(actions.onLoadMorePopular(storeName,pageIndex,pageSize,item,callBack)),
+});
+const PopularTabPage=connect(mapStateToProps,mapDispatchToProps)(PopularTab);
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 30
   },
   tabStyle:{
     minWidth: 50
@@ -101,6 +182,13 @@ const styles = StyleSheet.create({
     fontSize:13,
     marginTop:6,
     marginBottom:6
+  },
+  indicatorContainer:{
+    alignItems:'center'
+  },
+  indicator:{
+    color:'red',
+    margin:10
   }
 
 
